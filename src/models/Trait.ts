@@ -57,7 +57,7 @@ export default class Trait {
   getEffectLevel(count: number) {
     return this.effects.find(({ maxUnits, minUnits }) => {
       return (minUnits as number) <= count && count <= (maxUnits as number)
-    })?.level ?? 0
+    })?.level as number ?? 0
   }
 
   compare(other: Trait, thisChampionCount: number, otherChampionCount: number) {

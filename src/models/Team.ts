@@ -1,4 +1,5 @@
 import Champion from "./Champion"
+import Trait from "./Trait"
 
 type NullableChampion = Champion | null
 
@@ -80,7 +81,7 @@ export default class Team {
 
     return distinctChampions.
       reduce(
-        (traits, champion) => {
+        (traits: Map<Trait, number>, champion) => {
           champion.traits.forEach(trait => {
             traits.set(trait, (traits.get(trait) ?? 0) + 1)
           })

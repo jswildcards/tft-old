@@ -77,12 +77,13 @@ function revertHighlightChampions() {
   </div>
 
   <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
-    <div class="hidden relative xl:flex flex-col items-end h-80 mb-2 w-48">
+    <div class="hidden xl:flex flex-col items-end h-80 mb-2 w-48">
       <div
         v-for="[trait, count] in teamStore.team.getSortedActiveTraits()"
         :key="trait.id"
         @mouseenter="highlightChampions(trait)"
         @mouseleave="revertHighlightChampions"
+        class="relative"
       >
         <div :class="`p-2 m-1 inline-flex w-48 items-center rounded ${traitEffectLevelBackground[trait.getEffectLevel(count)]}`">
           <SquareImage class="mr-2" size="sm" :src="trait.imageSource" />
@@ -103,20 +104,20 @@ function revertHighlightChampions() {
             <div v-else>{{ count }} / {{ trait.minUnitsToNextLevel(count) }}</div>
           </div>
         </div>
-      </div>
 
-      <div class="absolute w-80 top-0 right-full mr-1 bg-slate-900 p-4 rounded z-20" v-if="traitDisplaying !== null">
-        <div v-html="traitDisplaying.desc"></div>
-        <div class="grid grid-cols-auto-fit gap-2 mt-2 justify-center">
-          <ChampionIcon
-            v-for="champion in filterChampions([], [traitDisplaying], '')"
-            :key="champion.id"
-            :champion="champion"
-            :showName="true"
-            :class="teamStore.team.includeChampion(champion) ? '' : 'opacity-30'"
-            draggable="true"
-            @dragstart="onPoolDragStart(champion)"
-          />
+        <div class="absolute w-80 top-0 left-full mr-1 bg-slate-900 p-4 rounded z-20" v-if="traitDisplaying === trait">
+          <div v-html="traitDisplaying.desc"></div>
+          <div class="grid grid-cols-auto-fit gap-2 mt-2 justify-center">
+            <ChampionIcon
+              v-for="champion in filterChampions([], [traitDisplaying], '')"
+              :key="champion.id"
+              :champion="champion"
+              :showName="true"
+              :class="teamStore.team.includeChampion(champion) ? '' : 'opacity-30'"
+              draggable="true"
+              @dragstart="onPoolDragStart(champion)"
+            />
+          </div>
         </div>
       </div>
     </div>
