@@ -18,7 +18,10 @@ const routes = [
   { path: '/items', component: ItemsPage },
 ]
 
-const router = createRouter({ history: createWebHistory(), routes })
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes,
+})
 const store = createPinia()
 const app = createApp(App)
 
