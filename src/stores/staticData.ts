@@ -114,7 +114,7 @@ export const useStaticDataStore = defineStore('staticData', {
             name: citem.name,
             desc: citem.desc,
             composition: citem.composition,
-            image: `/img/tft-item/${(ditem.image as Record<string, string>).full}`,
+            image: `${baseUrl}img/tft-item/${(ditem.image as Record<string, string>).full}`,
           })
         }).
         filter((item) => {
@@ -129,7 +129,7 @@ export const useStaticDataStore = defineStore('staticData', {
           return new Trait({
             id: dtrait.id as string,
             name: dtrait.name as string,
-            imageSource: `/img/tft-trait/${(dtrait.image as Record<string, string>).full}`,
+            imageSource: `${baseUrl}img/tft-trait/${(dtrait.image as Record<string, string>).full}`,
             effects: ctrait.effects,
             desc: ctrait.desc,
           })
@@ -155,14 +155,20 @@ export const useStaticDataStore = defineStore('staticData', {
                 find((item: Record<string, unknown>) => item.apiName === hero_augment)
             })
 
-          cchampion.ability.imageSource = `/img/tft-ability/${cchampion.ability.icon}`
+          cchampion.ability.imageSource = `${baseUrl}img/tft-ability/${cchampion.ability.icon}`
+
+          const image = {
+            splash: baseUrl + (dchampion.image as Record<string, string>).splash.replace('/', ''),
+            tile: baseUrl + (dchampion.image as Record<string, string>).tile.replace('/', ''),
+            ability: baseUrl + (dchampion.image as Record<string, string>).ability.replace('/', ''),
+          }
 
           return new Champion({
             id:   dchampion.id as string,
             name: cchampion.name,
             cost: cchampion.cost,
             imageSource: `https://raw.communitydragon.org/13.7/game/${cchampion.icon.toLowerCase().replace(".dds", ".png")}`,
-            image: dchampion.image as Record<string, string>,
+            image,
             traits,
             ability: cchampion.ability,
             stats: cchampion.stats,
