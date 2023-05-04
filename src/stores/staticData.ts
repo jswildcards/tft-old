@@ -69,7 +69,9 @@ export const useStaticDataStore = defineStore('staticData', {
       if(this.champions.length > 0)
         return
 
-      const cdragon = await fetch("/data/13.7.1/community_dragon_full.json").
+      const baseUrl = import.meta.env.BASE_URL
+
+      const cdragon = await fetch(`${baseUrl}data/13.7.1/community_dragon_full.json`).
         then((res) => res.json()).
         then((res) => {
           return {
@@ -87,7 +89,7 @@ export const useStaticDataStore = defineStore('staticData', {
           "hero-augments",
           "augments",
         ].map((name) => {
-          return fetch(`/data/13.7.1/data_dragon/tft-${name}.json`).
+          return fetch(`${baseUrl}data/13.7.1/data_dragon/tft-${name}.json`).
             then((res) => res.json()).
             then((res): Record<string, unknown>[] => Object.values(res.data))
         })
