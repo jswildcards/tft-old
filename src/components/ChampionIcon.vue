@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, toRefs } from 'vue'
 
-import Champion from '../models/champion'
-import Trait from '../models/trait'
+import Champion from '../models/Champion'
+import Trait from '../models/Trait'
 import SquareImage from './SquareImage.vue'
 
 interface Props {
@@ -13,14 +13,13 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  activeTraits: [],
   showTraits: true,
   showName: false,
 })
 
 const { champion, activeTraits, showTraits } = toRefs(props)
 
-const championBorderColors = {
+const championBorderColors: Record<number, string> = {
   1: "border-slate-500",
   2: "border-green-600",
   3: "border-sky-600",
@@ -33,8 +32,8 @@ const traitBackgroundColors = {
   active: 'bg-amber-500 border-amber-400',
 }
 
-function traitBackground(trait) {
-  if(activeTraits.value.includes(trait))
+function traitBackground(trait: Trait) {
+  if(activeTraits?.value?.includes(trait))
     return traitBackgroundColors.active
 
   return traitBackgroundColors.normal
@@ -45,7 +44,7 @@ function traitBackground(trait) {
   <div class="w-20 flex flex-col items-center text-center">
     <div class="whitespace-nowrap">
       <div v-if="showTraits" class="relative flex flex-wrap justify-center -mb-4 z-10">
-        <div v-for="trait in champion.traits">
+        <div v-for="trait in champion.traits" :key="trait.id">
           <SquareImage :src="trait.imageSource" :class="`p-1 rounded-full border-2 ${traitBackground(trait)}`" size="sm" />
         </div>
       </div>

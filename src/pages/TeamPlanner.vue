@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { Ref, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import { useStaticDataStore } from '../stores/staticData'
 import { useTeamStore } from '../stores/team'
 import ChampionIcon from '../components/ChampionIcon.vue'
 import SquareImage from '../components/SquareImage.vue'
+import Champion from '../models/Champion'
+import Trait from '../models/Trait'
 
 const staticDataStore = useStaticDataStore()
 const { filterChampions } = storeToRefs(staticDataStore)
@@ -13,9 +15,13 @@ staticDataStore.fetchData()
 
 const teamStore = useTeamStore()
 
-const championDragging = ref(null)
-const championMoveFrom = ref(null)
-const traitDisplaying = ref(null)
+type NullableChampion = Champion | null
+type NullablePoint = {i: number, j: number} | null
+type NullableTrait = Trait | null
+
+const championDragging: Ref<NullableChampion> = ref(null)
+const championMoveFrom: Ref<NullablePoint> = ref(null)
+const traitDisplaying: Ref<NullableTrait> = ref(null)
 
 const traitEffectLevelBackground = [
   'bg-slate-800 hover:bg-slate-700',
@@ -25,11 +31,11 @@ const traitEffectLevelBackground = [
   'bg-red-500   hover:bg-red-600',
 ]
 
-function onPoolDragStart(champion) {
+function onPoolDragStart(champion: Champion) {
   championDragging.value = champion
 }
 
-function onTeamDragStart(i, j) {
+function onTeamDragStart(i: number, j: number) {
   const champion = teamStore.team.champions[i][j]
 
   if(champion !== null) {
@@ -42,7 +48,7 @@ function onTeamDragEnd() {
   championMoveFrom.value = null
 }
 
-function updateTeam(i, j) {
+function updateTeam(i: number, j: number) {
   if(championMoveFrom.value !== null) {
     const { i: i1, j: j1 } = championMoveFrom.value
     teamStore.team.switchChampions(i1, j1, i, j)
@@ -54,7 +60,7 @@ function updateTeam(i, j) {
   championDragging.value = null
 }
 
-function highlightChampions(trait) {
+function highlightChampions(trait: Trait) {
   traitDisplaying.value = trait
 }
 
@@ -119,19 +125,21 @@ function revertHighlightChampions() {
       <div>
         <div
           v-for="(row, i) in teamStore.team.champions"
+          :key="i"
           class="flex justify-center odd:-ml-10 even:ml-10"
         >
           <div
             v-for="(champion, j) in row"
+            :key="j"
             :class="`m-2 w-16 h-16 rounded-full border-2 border-sky-600 cursor-grab ${ championMoveFrom !== null ? 'cursor-grabbing' : '' }`"
             @drop="updateTeam(i, j)"
             @dragstart="onTeamDragStart(i, j)"
-            @dragend="onTeamDragEnd(i, j)"
+            @dragend="onTeamDragEnd()"
             @dragover.prevent
             @dragenter.prevent
             @click="teamStore.team.removeChampion(i, j)"
           >
-            <ChampionIcon v-if="champion !== null" :champion="champion" :activeTraits="[traitDisplaying]" class="-mt-2.5 -ml-2.5" />
+            <ChampionIcon v-if="champion !== null" :champion="champion" :activeTraits="traitDisplaying ? [traitDisplaying] : undefined" class="-mt-2.5 -ml-2.5" />
           </div>
         </div>
       </div>
@@ -141,6 +149,7 @@ function revertHighlightChampions() {
       <div class="grid grid-cols-auto-fit justify-center">
         <div
           v-for="champion in staticDataStore.champions"
+          :key="champion.id"
           :class="`inline-block relative p-2 cursor-grab ${ teamStore.team.includeChampion(champion) ? 'opacity-30' : '' } ${ championDragging === champion ? 'cursor-grabbing' : '' }`"
           draggable="true"
           @dragstart="onPoolDragStart(champion)"
@@ -156,7 +165,7 @@ function revertHighlightChampions() {
         <h2 class="text-lg">Team</h2>
         <div class="mt-1">{{ teamStore.team.size }} / {{ teamStore.team.teamSizeLimit }}</div>
         <div class="grid grid-cols-auto-fit justify-center mt-4">
-          <button v-for="champion in teamStore.team.getTeamUniqueChampions()" class="p-2">
+          <button v-for="champion in teamStore.team.getTeamUniqueChampions()" :key="champion.id" class="p-2">
             <ChampionIcon
               :champion="champion"
               :showName="true"

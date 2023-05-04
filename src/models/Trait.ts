@@ -1,5 +1,19 @@
+interface TraitObject {
+  id: string
+  name: string
+  imageSource: string
+  effects: Record<string, unknown>[]
+  desc: string
+}
+
 export default class Trait {
-  constructor(id, name, imageSource, effects, desc) {
+  id: string
+  name: string
+  imageSource: string
+  effects: Record<string, unknown>[]
+  desc: string
+
+  constructor({id, name, imageSource, effects, desc}: TraitObject) {
     this.id = id
     this.name = name
     this.imageSource = imageSource
@@ -29,20 +43,20 @@ export default class Trait {
     })
   }
 
-  minUnitsToNextLevel(count) {
-    let currentMinUnits = "∞"
+  minUnitsToNextLevel(count: number) {
+    let currentMinUnits = Infinity
 
     this.effects.forEach(({ minUnits }) => {
-      if(count < minUnits && currentMinUnits === "∞")
-        currentMinUnits = minUnits
+      if(count < (minUnits as number) && currentMinUnits === Infinity)
+        currentMinUnits = (minUnits as number)
     })
 
     return currentMinUnits
   }
 
-  getEffectLevel(count) {
+  getEffectLevel(count: number) {
     return this.effects.find(({ maxUnits, minUnits }) => {
-      return minUnits <= count && count <= maxUnits
+      return (minUnits as number) <= count && count <= (maxUnits as number)
     })?.level ?? 0
   }
 

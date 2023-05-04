@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { Ref, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import { useStaticDataStore } from '../stores/staticData'
 import SquareImage from '../components/SquareImage.vue'
+import Item from '../models/Item'
 
-const currentItem = ref(null)
-const currentItemHovered = ref(null)
+type NullableItem = Item | null
+
+const currentItem: Ref<NullableItem> = ref(null)
+const currentItemHovered: Ref<NullableItem> = ref(null)
 
 const staticDataStore = useStaticDataStore()
 const { composableItems, getItemById } = storeToRefs(staticDataStore)
@@ -14,11 +17,11 @@ staticDataStore.fetchData().then(() => {
   currentItem.value = staticDataStore.baseItems[0]
 })
 
-function setCurrentItem(item) {
+function setCurrentItem(item: NullableItem) {
   currentItem.value = item
 }
 
-function hoverCurrentItem(item) {
+function hoverCurrentItem(item: NullableItem) {
   currentItemHovered.value = item
 }
 </script>
@@ -27,6 +30,7 @@ function hoverCurrentItem(item) {
   <div class="flex flex-wrap justify-center">
     <button
       v-for="item in staticDataStore.baseItems"
+      :key="item.id"
       :class="`rounded relative border-2 ${currentItem === item ? 'border-amber-200' : 'border-transparent'}`"
       @mouseenter="hoverCurrentItem(item)"
       @mouseleave="hoverCurrentItem(null)"
@@ -61,13 +65,13 @@ function hoverCurrentItem(item) {
     <div class="my-4 sm:grid gap-2 grid-cols-auto-fit justify-center">
       <h2 class="text-indigo-200 text-xl font-medium col-span-full">Composable Items</h2>
 
-      <div v-for="item in composableItems(currentItem)" class="bg-indigo-600 my-2 sm:my-0 w-full sm:w-96 rounded">
+      <div v-for="item in composableItems(currentItem)" :key="item.id" class="bg-indigo-600 my-2 sm:my-0 w-full sm:w-96 rounded">
         <div class="flex bg-indigo-700 p-4 rounded-t">
           <SquareImage :src="item.image" size="lg" class="rounded" />
           <div class="ml-4 flex flex-col justify-between">
             <div>{{ item.name }}</div>
             <div class="flex">
-              <SquareImage v-for="composition in item.composition" class="mr-2 rounded" :src="getItemById(composition).image" />
+              <SquareImage v-for="composition in item.composition" :key="composition" class="mr-2 rounded" :src="getItemById(composition)?.image ?? ''" />
             </div>
           </div>
         </div>

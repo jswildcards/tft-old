@@ -12,9 +12,9 @@ const { getChampionById, filterChampions } = storeToRefs(staticDataStore)
 staticDataStore.fetchData()
 
 const route = useRoute()
-const champion = computed(() => getChampionById.value(route.params.id))
+const champion = computed(() => getChampionById.value(route.params.id as string))
 
-const championBackgroundColors = {
+const championBackgroundColors: Record<number, string> = {
   1: "bg-slate-500",
   2: "bg-green-600",
   3: "bg-sky-600",
@@ -32,13 +32,13 @@ const championBackgroundColors = {
     <span class="font-bold">{{ champion.name }}</span>
   </div>
 
-  <div class="grid grid-cols-3 gap-8 p-4 bg-indigo-800 rounded shadow-lg">
+  <div class="grid grid-cols-3 gap-8 p-4 bg-indigo-800 rounded shadow-lg" v-if="champion">
     <div>
       <div>
         <div class="relative">
           <img :src="champion.image.splash" />
           <div class="absolute bottom-0 p-2 w-full">
-            <div class="flex items-center text-sm" v-for="trait in champion.traits">
+            <div class="flex items-center text-sm" v-for="trait in champion.traits" :key="trait.id">
               <img class="mr-2" width="20" :src="trait.imageSource" />
               <span>{{ trait.name }}</span>
             </div>
@@ -99,7 +99,8 @@ const championBackgroundColors = {
         <h2 class="inline-block border-b text-xl">Ability</h2>
         <div class="mt-2">
           <div class="flex mb-1">
-            <SquareImage class="mr-2" size="lg" :src="champion.ability.imageSource" />
+            <SquareImage class="mr-2" size="lg" :src="`${champion.ability.imageSource}`" />
+
             <div>
               <div class="text-lg">{{ champion.ability.name }}</div>
               <div class="text-sm mt-1">{{ champion.stats.initialMana }} / {{ champion.stats.mana }} <span class="text-indigo-200">Mana</span></div>
@@ -111,7 +112,7 @@ const championBackgroundColors = {
 
       <div class="mt-4">
         <h2 class="inline-block border-b text-xl mb-2">Hero Augments</h2>
-        <div class="mb-4" v-for="hero_augment in champion.hero_augments">
+        <div class="mb-4" v-for="hero_augment in champion.hero_augments" :key="`${hero_augment.id}`">
           <div class="flex mb-1">
             <SquareImage class="mr-2" size="lg" :src="champion.image.tile" />
             <div>
@@ -126,7 +127,7 @@ const championBackgroundColors = {
     <div>
       <div class="my-2">
         <h2 class="inline-block border-b text-xl">Traits</h2>
-        <div class="mt-2" v-for="trait in champion.traits">
+        <div class="mt-2" v-for="trait in champion.traits" :key="trait.id">
           <div class="flex items-center">
             <SquareImage class="mr-2" size="md" :src="trait.imageSource" />
             <span>{{ trait.name }}</span>
@@ -134,7 +135,7 @@ const championBackgroundColors = {
           <div class="text-sm" v-html="trait.desc"></div>
           <div>{{ trait.effects }}</div>
           <div class="flex flex-wrap">
-            <div v-for="champion in filterChampions([], [trait], '')">
+            <div v-for="champion in filterChampions([], [trait], '')" :key="champion.id">
               <router-link :to="`/champions/${champion.id}`">
                 <ChampionIcon :champion="champion" :showName="true" />
               </router-link>

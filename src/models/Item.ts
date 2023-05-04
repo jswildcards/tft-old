@@ -1,5 +1,19 @@
+interface ItemObject {
+  id: string
+  name: string
+  desc: string
+  composition: string[]
+  image: string
+}
+
 export default class Item {
-  constructor(id, name, desc, composition, image) {
+  id: string
+  name: string
+  desc: string
+  composition: string[]
+  image: string
+
+  constructor({id, name, desc, composition, image}: ItemObject) {
     this.id = id
     this.name = name
     this.desc = desc
@@ -7,7 +21,7 @@ export default class Item {
     this.image = image
   }
 
-  matchId(id) {
+  matchId(id: string) {
     id = id.toLowerCase()
     return this.id.toLowerCase() === id
   }

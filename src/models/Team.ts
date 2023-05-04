@@ -1,9 +1,25 @@
+import Champion from "./Champion"
+
+type NullableChampion = Champion | null
+
 export default class Team {
+  champions: NullableChampion[][]
+  size: number
+  teamSizeLimit: number
+
   constructor() {
-    this.reset()
+    const m = 4, n = 7
+
+    this.champions = Array.from(
+      { length: m },
+      () => new Array(n).fill(null)
+    )
+
+    this.size = 0
+    this.teamSizeLimit = 9
   }
 
-  addChampion(targetChampion, i, j) {
+  addChampion(targetChampion: Champion, i: number, j: number) {
     if(this.isFull() && this.champions[i][j] === null)
       return
 
@@ -13,20 +29,20 @@ export default class Team {
     this.champions[i][j] = targetChampion
   }
 
-  switchChampions(i1, j1, i2, j2) {
+  switchChampions(i1: number, j1: number, i2: number, j2: number) {
     const temp = this.champions[i1][j1]
     this.champions[i1][j1] = this.champions[i2][j2]
     this.champions[i2][j2] = temp
   }
 
-  removeChampion(i, j) {
+  removeChampion(i: number, j: number) {
     if(this.champions[i][j] !== null)
       this.size--
 
     this.champions[i][j] = null
   }
 
-  includeChampion(targetChampion) {
+  includeChampion(targetChampion: Champion) {
     return this.flattenedChampions().
       some((champion) => champion && champion.id === targetChampion.id)
   }
@@ -36,7 +52,7 @@ export default class Team {
   }
 
   flattenedChampions() {
-    return this.champions.flat().filter(Boolean)
+    return (this.champions.flat().filter(Boolean) as Champion[])
   }
 
   getTeamUniqueChampions() {

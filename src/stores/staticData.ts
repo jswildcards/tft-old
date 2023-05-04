@@ -1,25 +1,33 @@
 import { defineStore } from 'pinia'
 
-import Champion from '../models/champion'
-import Trait from '../models/trait'
-import Item from '../models/item'
+import Champion from '../models/Champion'
+import Trait from '../models/Trait'
+import Item from '../models/Item'
+
+interface State {
+  champions: Champion[]
+  traits: Trait[]
+  items: Item[]
+  hero_augments: Record<string, unknown>[]
+  augments: Record<string, unknown>[]
+}
 
 export const useStaticDataStore = defineStore('staticData', {
-  state: () => ({
-    champions:     null,
-    traits:        null,
-    items:         null,
-    hero_augments: null,
-    augments:      null,
+  state: (): State => ({
+    champions:     [],
+    traits:        [],
+    items:         [],
+    hero_augments: [],
+    augments:      [],
   }),
   getters: {
     getChampionById: function(state) {
-      return (id) => {
+      return (id: string) => {
         return state.champions?.find((champion) => champion.matchId(id))
       }
     },
     getItemById: function(state) {
-      return (id) => {
+      return (id: string) => {
         return state.items?.find((item) => item.matchId(id))
       }
     },
@@ -27,7 +35,7 @@ export const useStaticDataStore = defineStore('staticData', {
       return [...new Set(state.champions?.map(champion => champion.cost).sort())]
     },
     filterChampions: function(state) {
-      return (costs, traits, keyword) => {
+      return (costs: number[], traits: Trait[], keyword: string) => {
         keyword = keyword.toLowerCase()
 
         return state.champions?.
@@ -47,7 +55,7 @@ export const useStaticDataStore = defineStore('staticData', {
       return state.items?.filter(item => item.composition.length === 0)
     },
     composableItems: function(state) {
-      return (baseItem) => {
+      return (baseItem: Item) => {
         return state.items?.filter(
           (item) => {
             return item.composition.some(itemId => itemId === baseItem.id)
@@ -58,7 +66,7 @@ export const useStaticDataStore = defineStore('staticData', {
   },
   actions: {
     async fetchData() {
-      if(this.champions !== null && this.traits !== null)
+      if(this.champions.length > 0)
         return
 
       const cdragon = await fetch("/data/13.7.1/community_dragon_full.json").
@@ -81,7 +89,7 @@ export const useStaticDataStore = defineStore('staticData', {
         ].map((name) => {
           return fetch(`/data/13.7.1/data_dragon/tft-${name}.json`).
             then((res) => res.json()).
-            then((res) => Object.values(res.data))
+            then((res): Record<string, unknown>[] => Object.values(res.data))
         })
       ).
         then(([ champions, traits, items, hero_augments, augments ]) => {
@@ -97,9 +105,15 @@ export const useStaticDataStore = defineStore('staticData', {
       this.items = ddragon.items.
         map((ditem) => {
           const citem = cdragon.items.
-            find((citem) => ditem.id === citem.apiName)
+            find((citem: Record<string, unknown>) => ditem.id === citem.apiName)
 
-          return new Item(ditem.id, citem.name, citem.desc, citem.composition, `/img/tft-item/${ditem.image.full}`)
+          return new Item({
+            id: ditem.id as string,
+            name: citem.name,
+            desc: citem.desc,
+            composition: citem.composition,
+            image: `/img/tft-item/${(ditem.image as Record<string, string>).full}`,
+          })
         }).
         filter((item) => {
           return ((item.id.startsWith("TFT_Item") && !item.id.startsWith("TFT_Item_Grant")) || (item.id.startsWith("TFT8_Item") && item.composition.length > 0)) && !item.name.startsWith("tft_item")
@@ -108,9 +122,15 @@ export const useStaticDataStore = defineStore('staticData', {
       this.traits = ddragon.traits.
         map((dtrait) => {
           const ctrait = cdragon.traits.
-            find((ctrait) => dtrait.id === ctrait.apiName)
+            find((ctrait: Record<string, unknown>) => dtrait.id === ctrait.apiName)
 
-          return new Trait(dtrait.id, dtrait.name, `/img/tft-trait/${dtrait.image.full}`, ctrait.effects, ctrait.desc)
+          return new Trait({
+            id: dtrait.id as string,
+            name: dtrait.name as string,
+            imageSource: `/img/tft-trait/${(dtrait.image as Record<string, string>).full}`,
+            effects: ctrait.effects,
+            desc: ctrait.desc,
+          })
         }).
         sort((a, b) => {
           return a.compare(b, 0, 0)
@@ -119,28 +139,28 @@ export const useStaticDataStore = defineStore('staticData', {
       this.champions = ddragon.champions.
         map((dchampion) => {
           const cchampion = cdragon.champions.
-            find((cchampion) => dchampion.id === cchampion.apiName)
+            find((cchampion: Record<string, unknown>) => dchampion.id === cchampion.apiName)
 
           const traits = cchampion.traits.
-            map((traitName) => {
+            map((traitName: string) => {
               return this.traits.
                 find((trait) => trait.name === traitName)
             })
 
-          const hero_augments = dchampion.hero_augments.
+          const hero_augments = (dchampion.hero_augments as string[]).
             map((hero_augment) => {
               return cdragon.items.
-                find((item) => item.apiName === hero_augment)
+                find((item: Record<string, unknown>) => item.apiName === hero_augment)
             })
 
           cchampion.ability.imageSource = `/img/tft-ability/${cchampion.ability.icon}`
 
           return new Champion({
-            id:   dchampion.id,
+            id:   dchampion.id as string,
             name: cchampion.name,
             cost: cchampion.cost,
             imageSource: `https://raw.communitydragon.org/13.7/game/${cchampion.icon.toLowerCase().replace(".dds", ".png")}`,
-            image: dchampion.image,
+            image: dchampion.image as Record<string, string>,
             traits,
             ability: cchampion.ability,
             stats: cchampion.stats,
@@ -154,7 +174,7 @@ export const useStaticDataStore = defineStore('staticData', {
       this.augments = ddragon.augments.
         map((daugment) => {
           const caugment = cdragon.items.
-            find((caugment) => caugment.apiName === daugment.id)
+            find((caugment: Record<string, unknown>) => caugment.apiName === daugment.id)
 
           return caugment
         })

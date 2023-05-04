@@ -1,28 +1,29 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { Ref, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import { useStaticDataStore } from '../stores/staticData'
 import ChampionIcon from '../components/ChampionIcon.vue'
+import Trait from '../models/Trait'
 
 const staticDataStore = useStaticDataStore()
 const { filterChampions } = storeToRefs(staticDataStore)
 staticDataStore.fetchData()
 
-const costsSelected = ref([])
-const traitsSelected = ref([])
+const costsSelected: Ref<number[]> = ref([])
+const traitsSelected: Ref<Trait[]> = ref([])
 const keyword = ref("")
 const filtersShow = ref(false)
 
-function costCheckIcon(cost) {
-  if(this.costsSelected.includes(cost))
+function costCheckIcon(cost: number) {
+  if(costsSelected.value.includes(cost))
     return "check_box"
 
   return "check_box_outline_blank"
 }
 
 function filtersExpandIcon() {
-  if(this.filtersShow)
+  if(filtersShow.value)
     return 'expand_less'
 
   return 'expand_more'
@@ -38,36 +39,36 @@ const traitDisplayBackgroundColors = {
   active: 'bg-amber-500',
 }
 
-function traitSwitchBackgroundColor(trait) {
+function traitSwitchBackgroundColor(trait: Trait) {
   const { active, normal } = traitSwitchBackgroundColors
 
-  if(this.traitsSelected.includes(trait))
+  if(traitsSelected.value.includes(trait))
     return active
 
   return normal
 }
 
-function traitDisplayBackgroundColor(trait) {
+function traitDisplayBackgroundColor(trait: Trait) {
   const { active, normal } = traitDisplayBackgroundColors
 
-  if(this.traitsSelected.includes(trait))
+  if(traitsSelected.value.includes(trait))
     return active
 
   return normal
 }
 
-function checkCost(cost) {
-  if(this.costsSelected.includes(cost))
-    this.costsSelected = this.costsSelected.filter((selectedCost) => selectedCost !== cost)
+function checkCost(cost: number) {
+  if(costsSelected.value.includes(cost))
+    costsSelected.value = costsSelected.value.filter((selectedCost: number) => selectedCost !== cost)
   else
-    this.costsSelected = [...this.costsSelected, cost]
+    costsSelected.value = [...costsSelected.value, cost]
 }
 
-function checkTrait(trait) {
-  if(this.traitsSelected.includes(trait))
-    this.traitsSelected = this.traitsSelected.filter((selectedTrait) => selectedTrait !== trait)
+function checkTrait(trait: Trait) {
+  if(traitsSelected.value.includes(trait))
+    traitsSelected.value = traitsSelected.value.filter((selectedTrait: Trait) => selectedTrait !== trait)
   else
-    this.traitsSelected = [...this.traitsSelected, trait]
+    traitsSelected.value = [...traitsSelected.value, trait]
 }
 </script>
 
