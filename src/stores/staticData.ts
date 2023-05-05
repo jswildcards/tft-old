@@ -3,12 +3,12 @@ import { defineStore } from 'pinia'
 import Champion from '../models/Champion'
 import Trait from '../models/Trait'
 import Item from '../models/Item'
+import HeroAugment from '../models/HeroAugment'
 
 interface State {
   champions: Champion[]
   traits: Trait[]
   items: Item[]
-  hero_augments: Record<string, unknown>[]
   augments: Record<string, unknown>[]
 }
 
@@ -17,7 +17,6 @@ export const useStaticDataStore = defineStore('staticData', {
     champions:     [],
     traits:        [],
     items:         [],
-    hero_augments: [],
     augments:      [],
   }),
   getters: {
@@ -115,6 +114,7 @@ export const useStaticDataStore = defineStore('staticData', {
             desc: citem.desc,
             composition: citem.composition,
             image: `${baseUrl}img/tft-item/${(ditem.image as Record<string, string>).full}`,
+            effects: citem.effects,
           })
         }).
         filter((item) => {
@@ -151,8 +151,15 @@ export const useStaticDataStore = defineStore('staticData', {
 
           const hero_augments = (dchampion.hero_augments as string[]).
             map((hero_augment) => {
-              return cdragon.items.
+              const item = cdragon.items.
                 find((item: Record<string, unknown>) => item.apiName === hero_augment)
+
+              return new HeroAugment({
+                id: item.apiName as string,
+                name: item.name as string,
+                effects: item.effects,
+                desc: item.desc,
+              })
             })
 
           cchampion.ability.imageSource = `${baseUrl}img/tft-ability/${cchampion.ability.icon}`

@@ -106,7 +106,11 @@ function revertHighlightChampions() {
         </div>
 
         <div class="absolute w-80 top-0 left-full mr-1 bg-slate-900 p-4 rounded z-20" v-if="traitDisplaying === trait">
-          <div v-html="traitDisplaying.desc"></div>
+          <div class="flex items-center">
+            <img :src="trait.imageSource" class="mr-1" width="24" height="24"/>
+            {{ trait.name }}
+          </div>
+          <div v-html="traitDisplaying.sanitizedDescription()" class="my-2"></div>
           <div class="grid grid-cols-auto-fit gap-2 mt-2 justify-center">
             <ChampionIcon
               v-for="champion in filterChampions([], [traitDisplaying], '')"

@@ -1,4 +1,6 @@
 import Trait from '../models/Trait'
+import HeroAugment from './HeroAugment';
+import StringSanitizer from './StringSantizer';
 
 interface ChampionObject {
   id:   string;
@@ -9,7 +11,7 @@ interface ChampionObject {
   traits: Trait[];
   ability: Record<string, unknown>;
   stats: Record<string, unknown>;
-  hero_augments: Record<string, unknown>[];
+  hero_augments: HeroAugment[];
 }
 
 export default class Champion {
@@ -21,7 +23,7 @@ export default class Champion {
   traits: Trait[];
   ability: Record<string, unknown>;
   stats: Record<string, unknown>;
-  hero_augments: Record<string, unknown>[];
+  hero_augments: HeroAugment[];
 
   constructor({id, name, cost, imageSource, image, traits, ability, stats, hero_augments}: ChampionObject) {
     this.id   = id
@@ -47,6 +49,10 @@ export default class Champion {
   matchId(id: string) {
     id = id.toLowerCase()
     return this.id.toLowerCase() === id
+  }
+
+  sanitizedAbilityDescription() {
+    return StringSanitizer.sanitize(this.ability.desc as string)
   }
 
   compare(other: Champion, traits: Trait[]) {

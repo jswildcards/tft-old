@@ -1,3 +1,5 @@
+import StringSanitizer from "./StringSantizer"
+
 interface TraitObject {
   id: string
   name: string
@@ -58,6 +60,10 @@ export default class Trait {
     return this.effects.find(({ maxUnits, minUnits }) => {
       return (minUnits as number) <= count && count <= (maxUnits as number)
     })?.level as number ?? 0
+  }
+
+  sanitizedDescription() {
+    return StringSanitizer.sanitize(this.desc)
   }
 
   compare(other: Trait, thisChampionCount: number, otherChampionCount: number) {

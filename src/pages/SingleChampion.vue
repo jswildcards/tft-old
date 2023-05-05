@@ -36,7 +36,7 @@ const championBackgroundColors: Record<number, string> = {
     <div>
       <div>
         <div class="relative">
-          <img :src="champion.image.splash" />
+          <img :src="champion.image.splash" class="rounded-t" />
           <div class="absolute bottom-0 p-2 w-full">
             <div class="flex items-center text-sm" v-for="trait in champion.traits" :key="trait.id">
               <img class="mr-2" width="20" :src="trait.imageSource" />
@@ -45,7 +45,7 @@ const championBackgroundColors: Record<number, string> = {
           </div>
         </div>
 
-        <div :class="`text-2xl p-2 flex justify-between ${championBackgroundColors[champion.cost]}`">
+        <div :class="`text-2xl rounded-b p-2 flex justify-between ${championBackgroundColors[champion.cost]}`">
           <div>{{ champion.name }}</div>
           <div class="flex">
             <img class="mr-2" width="20" src="/img/common/icon-gold.svg" />
@@ -99,12 +99,12 @@ const championBackgroundColors: Record<number, string> = {
         <h2 class="inline-block border-b text-xl">Ability</h2>
         <div class="mt-2">
           <div class="flex mb-1">
-            <SquareImage class="mr-2" size="lg" :src="`${champion.ability.imageSource}`" />
+            <SquareImage class="mr-2 rounded" size="lg" :src="`${champion.ability.imageSource}`" />
 
             <div>
               <div class="text-lg">{{ champion.ability.name }}</div>
               <div class="text-sm mt-1">{{ champion.stats.initialMana }} / {{ champion.stats.mana }} <span class="text-indigo-200">Mana</span></div>
-              <div class="text-sm mt-2" v-html="champion.ability.desc"></div>
+              <div class="text-sm mt-2" v-html="champion.sanitizedAbilityDescription()"></div>
             </div>
           </div>
         </div>
@@ -114,10 +114,10 @@ const championBackgroundColors: Record<number, string> = {
         <h2 class="inline-block border-b text-xl mb-2">Hero Augments</h2>
         <div class="mb-4" v-for="hero_augment in champion.hero_augments" :key="`${hero_augment.id}`">
           <div class="flex mb-1">
-            <SquareImage class="mr-2" size="lg" :src="champion.image.tile" />
+            <SquareImage class="mr-2 rounded" size="lg" :src="champion.image.tile" />
             <div>
               <div class="text-lg">{{ hero_augment.name }}</div>
-              <div class="text-sm" v-html="hero_augment.desc"></div>
+              <div class="text-sm" v-html="hero_augment.sanitizedDescription()"></div>
             </div>
           </div>
         </div>
@@ -132,8 +132,7 @@ const championBackgroundColors: Record<number, string> = {
             <SquareImage class="mr-2" size="md" :src="trait.imageSource" />
             <span>{{ trait.name }}</span>
           </div>
-          <div class="text-sm" v-html="trait.desc"></div>
-          <div>{{ trait.effects }}</div>
+          <div class="text-sm my-2" v-html="trait.sanitizedDescription()"></div>
           <div class="flex flex-wrap">
             <div v-for="champion in filterChampions([], [trait], '')" :key="champion.id">
               <router-link :to="`/champions/${champion.id}`">

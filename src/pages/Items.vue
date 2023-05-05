@@ -58,7 +58,12 @@ function hoverCurrentItem(item: NullableItem) {
           <SquareImage :src="currentItem.image" size="lg" class="rounded" />
           <div class="ml-4">{{ currentItem.name }}</div>
         </div>
-        <div v-html="currentItem.desc" class="p-4"></div>
+        <div v-html="currentItem.sanitizedDescription()" class="p-4"></div>
+        <div class="p-4">
+          <div v-for="key in currentItem.statsEffectKeys()" :key="key">
+            <div>{{ `${key}: ${currentItem.effects[key]}` }}</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -75,7 +80,12 @@ function hoverCurrentItem(item: NullableItem) {
             </div>
           </div>
         </div>
-        <div v-html="item.desc" class="p-4"></div>
+        <div v-html="item.sanitizedDescription()" class="p-4"></div>
+        <div class="p-4">
+          <div v-for="key in item.statsEffectKeys()" :key="key">
+            <div>{{ `${key}: ${item.effects[key]}` }}</div>
+          </div>
+        </div>
       </div>
 
     </div>
